@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Productos</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+    <h1>Productos</h1>
+    <ul id="productList"></ul>
+
+    <script>
+        // Función para hacer la solicitud a la API y mostrar los productos en la página
+        function fetchProductos() {
+            // Hacer la solicitud a la API
+            fetch('/Productos')
+                .then(response => response.json())
+                .then(data => {
+                    // Obtener la lista de productos
+                    const productList = document.getElementById('productList');
+
+                    // Limpiar la lista de productos
+                    productList.innerHTML = '';
+
+                    // Recorrer los productos y crear elementos de lista para cada uno
+                    data.forEach(product => {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('product');
+                        listItem.textContent = `Nombre: ${product.nombre}, Precio: ${product.precio}`;
+                        productList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error al obtener los productos:', error));
+        }
+
+        // Llamar a la función para obtener y mostrar los productos al cargar la página
+        fetchProductos();
+    </script>
+</body>
+
+</html>

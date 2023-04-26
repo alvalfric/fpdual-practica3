@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Práctica 3: Spring Boot</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            border: 1px solid grey;
+		  	border-radius: 8px;
+		  	padding: 5px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            width: 98%;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left">
+            <h1>Práctica 3: Spring Boot</h1>
+            <div class="right">
+	            <h2>Productos</h2>
+	            <p id="ProductosResultado"></p>
+	        </div>
+	        <h2>Llamadas API</h2>
+            <button onclick="cargarProductos()">Cargar productos</button>
+            <br><br><br>
+            <button onclick="obtenerProductos()">Obtener productos</button>
+            <br><br><br>
+            <form onsubmit="agregarProducto(); return false;">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre">
+                <label for="precio">Precio:</label>
+                <input type="number" step="0.01" id="precio" name="precio">
+                <label for="cantidad">Cantidad:</label>
+                <input type="number" id="cantidad" name="cantidad">
+                <button type="submit">Agregar producto</button>
+            </form>
+            <br><br>
+            <form onsubmit="actualizarProducto(); return false;">
+                <label for="idModificar">ID:</label>
+                <input type="number" id="idModificar" name="idModificar">
+                <label for="nombreModificar">Nombre:</label>
+                <input type="text" id="nombreModificar" name="nombreModificar">
+                 <label for="precioModificar">Precio:</label>
+                <input type="number" step="0.01" id="precioModificar" name="precioModificar">
+                <label for="cantidadModificar">Cantidad:</label>
+                <input type="number" id="cantidadModificar" name="cantidadModificar">
+                <button type="submit">Actualizar producto</button>
+            </form>
+            <br><br>
+            <form onsubmit="eliminarProducto(); return false;">
+                <label for="idEliminar">ID:</label>
+                <input type="number" id="idEliminar" name="idEliminar">
+                <button type="submit">Eliminar producto</button>
+            </form>
+            <br><br>
+            <button onclick="eliminarProductos()">Eliminar productos</button>
+        </div>
+    </div>
+
+    <script>
+	    function cargarProductos() {
+	        var xhr = new XMLHttpRequest();
+	        xhr.onreadystatechange = function() {
+	            if (xhr.readyState === 4 && xhr.status === 200) {
+	                var Productos = JSON.parse(xhr.responseText);
+	                mostrarProductos(Productos);
+	            }
+	        };
+	        xhr.open("GET", "/cargarProductos", true);
+	        xhr.send();
+	    }
+    
+        function obtenerProductos() {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var Productos = JSON.parse(xhr.responseText);
+                    mostrarProductos(Productos);
+                }
+            };
+            xhr.open("GET", "/productos", true);
+            xhr.send();
+        }
+
+        function mostrarProductos(Productos) {
+            var resultado = document.getElementById("ProductosResultado");
+            resultado.innerHTML = "Productos: " + JSON.stringify(Productos);
+        }
+
+        function agregarProducto() {
+            var nombre = document.getElementById("nombre").value;
+            var precio = document.getElementById("precio").value;
+            var cantidad = document.getElementById("cantidad").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    obtenerProductos();
+                }
+            };
+            xhr.open("POST", "/producto", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.send(JSON.stringify({ nombre: nombre, precio: precio, cantidad: cantidad }));
+        }
+        
+        function actualizarProducto() {
+            var id = document.getElementById("idModificar").value;
+            var nombre = document.getElementById("nombreModificar").value;
+            var precio = document.getElementById("precioModificar").value;
+            var cantidad = document.getElementById("cantidadModificar").value;
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    obtenerProductos();
+                }
+            };
+            xhr.open("PUT", "/productos/" + id, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.send(JSON.stringify({ nombre: nombre, precio: precio, cantidad: cantidad }));
+        }
+
+        function eliminarProducto() {
+            var id = document.getElementById("idEliminar").value;
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    obtenerProductos();
+                }
+            };
+            xhr.open("DELETE", "/productos/" + id, true);
+            xhr.send();
+        }
+        
+        function eliminarProductos() {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    obtenerProductos();
+                }
+            };
+            xhr.open("DELETE", "/productos", true);
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
